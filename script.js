@@ -40,24 +40,31 @@
 
   function formatNumber(num) {
     if (num === "" || isNaN(num)) return num;
-    const clean = num.toString().replace(/\./g, "");
-    return clean.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    const [integerPart, decimalPart] = num.toString().split(".");
+    const formattedInt = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return decimalPart ? `${formattedInt},${decimalPart}` : formattedInt;
   }
 
   function render() {
-    try {      
-      const formattedExpr = expr.replace(/\d+(\.\d+)?/g, match => formatNumber(match));
-      exprEl.textContent = formattedExpr || "0";
+  try {
+    let formattedExpr = expr
+      .replace(/\*/g, "x")
+      .replace(/\//g, ":")
+      .replace(/\d+(\.\d+)?/g, match => formatNumber(match));
 
-      if (!isFinal) {
-        const val = evalPercent(expr);
-        resultEl.textContent = isNaN(val) ? "0" : formatNumber(val);
-      }
-    } catch {
-      exprEl.textContent = expr || "0";
-      resultEl.textContent = "0";
+    exprEl.textContent = formattedExpr || "0";
+
+    if (!isFinal) {
+      const val = evalPercent(expr);
+      resultEl.textContent = isNaN(val) ? "0" : formatNumber(val);
     }
+  } catch {
+    exprEl.textContent = expr || "0";
+    resultEl.textContent = "0";
   }
+}
+
+
 
   function evalPercent(expression) {
     let expr = expression;
@@ -85,54 +92,56 @@
       expr = "";
       isFinal = false;
     }
+
     const last = expr.slice(-1);
     if (OPS.includes(v) && OPS.includes(last)) {
       expr = expr.slice(0, -1) + v;
     } else {
       expr += v;
     }
+
     resultEl.classList.remove("show");
     render();
   }
+
 
   function handleFn(f) {
-  if (f === "clear") {
-    expr = "";
-    isFinal = false;
-    currentResult = null;
-    resultEl.classList.remove("show");
-    render();
-    return;
-  }
-  if (f === "back") {
-    expr = expr.slice(0, -1);
-    render();
-    return;
-  }
-  if (f === "paren") {
-    const o = (expr.match(/\(/g) || []).length;
-    const c = (expr.match(/\)/g) || []).length;
-    expr += o > c ? ")" : "(";
-    render();
-    return;
-  }
-  if (f === "equals") {
-    try {
-    const val = evalPercent(expr);
-    history.unshift(expr + " = " + val);
-    expr = String(val);
-    isFinal = true;
-    renderHistory();
-    render();
+    if (f === "clear") {
+      expr = "";
+      isFinal = false;
+      resultEl.classList.remove("show");
+      render();
+      return;
+    }
+    if (f === "back") {
+      expr = expr.slice(0, -1);
+      render();
+      return;
+    }
+    if (f === "paren") {
+      const o = (expr.match(/\(/g) || []).length;
+      const c = (expr.match(/\)/g) || []).length;
+      expr += o > c ? ")" : "(";
+      render();
+      return;
+    }
+    if (f === "equals") {
+      try {
+        const val = evalPercent(expr);
+        history.unshift(expr + " = " + val);
+        expr = String(val);
+        isFinal = true;
+        renderHistory();
+        render();
 
-    resultEl.classList.remove("show");
-    void resultEl.offsetWidth;
-    resultEl.classList.add("show");
-  } catch {
-    resultEl.textContent = "Not Found";
-   }
+        resultEl.classList.remove("show");
+        void resultEl.offsetWidth;
+        resultEl.classList.add("show");
+      } catch {
+        resultEl.textContent = "Not Found";
+      }
+    }
   }
-}
   function renderHistory() {
     historyEl.innerHTML = history
       .map((h) => `<div class="hist-item">${h}</div>`)
@@ -140,7 +149,7 @@
 
     document.querySelectorAll(".hist-item").forEach((el) => {
       el.onclick = () => {
-        const val = el.textContent.split(" = ")[1].replace(/\./g, "");
+        const val = el.textContent.split(" = ")[1].replace(/\./g, "").replace(/,/g, ".");
         expr = val;
         isFinal = false;
         render();
@@ -232,40 +241,17 @@
   const resultDisplay = document.getElementById("result");
   const displayBox = document.querySelector(".display");
 
-function formatResultNumber(num) {
-  if (num === "" || isNaN(num)) return num;
-  const [integerPart, decimalPart] = num.toString().split(".");
-  const formattedInt = parseInt(integerPart).toLocaleString("en-US");
-  return decimalPart ? `${formattedInt}.${decimalPart}` : formattedInt;
-}
 
-function showResult() {
-  try {
-    const expression = exprDisplay.textContent
-      .replace(/,/g, "")
-      .replace(/×/g, "*")
-      .replace(/÷/g, "/");
-    const result = eval(expression);
-    resultDisplay.textContent = formatResultNumber(result);
-    
-    displayBox.classList.add("show-result");
-  } catch {
-    resultDisplay.textContent = "Error";
-    displayBox.classList.add("show-result");
-  }
-}
 
-document.querySelector('[data-fn="equals"]').addEventListener("click", showResult);
-const equalsBtn = document.querySelector('[data-fn="equals"]');
-if (equalsBtn) {
-  equalsBtn.addEventListener("click", showResult);
-}
+ 
 
-document.querySelectorAll(".keys button[data-value]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    displayBox.classList.remove("show-result");
+
+
+  document.querySelectorAll(".keys button[data-value]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      displayBox.classList.remove("show-result");
+    });
   });
-});
 
 
   render();
