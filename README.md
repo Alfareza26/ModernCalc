@@ -1,7 +1,5 @@
 # ModernCalc - Kalkulator Modern Web
 
-![ModernCalc Logo](https://img.shields.io/badge/Version-1.0-blue.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg)
-
 **ModernCalc** adalah kalkulator web dengan desain futuristik dan pengaturan yang fleksibel, dikembangkan oleh **Alff Senpai & Saka.dlv**. Kalkulator ini dirancang untuk memberikan pengalaman perhitungan yang intuitif dengan fitur-fitur canggih seperti riwayat otomatis, kontrol keyboard penuh, dan opsi penyesuaian tema serta tampilan.
 
 ![Live](https://alfareza26.github.io/ModernCalc/)
@@ -54,9 +52,8 @@
 
 ## 👥 Kontributor
 
-- **Alff Senpai** - Pengembang Utama
+- **Alff Senpai** - Pengembang Utama & Code Developer
 - **Saka.dlv** - Kontributor Desain dan Fitur
-
 ## 📄 Lisensi
 
 Proyek ini dilisensikan di bawah **MIT License**. Lihat file `LICENSE` untuk detail lebih lanjut.
