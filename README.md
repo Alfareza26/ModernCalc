@@ -2,7 +2,7 @@
 
 **ModernCalc** adalah kalkulator web dengan desain futuristik dan pengaturan yang fleksibel, dikembangkan oleh **Alff Senpai & Saka.dlv**. Kalkulator ini dirancang untuk memberikan pengalaman perhitungan yang intuitif dengan fitur-fitur canggih seperti riwayat otomatis, kontrol keyboard penuh, dan opsi penyesuaian tema serta tampilan.
 
-![Live](https://alfareza26.github.io/ModernCalc/)
+[Live](https://alfareza26.github.io/ModernCalc/)
 
 ## ✨ Fitur Utama
 
