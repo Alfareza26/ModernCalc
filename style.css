@@ -462,6 +462,81 @@ body.light-theme .keys button[data-fn="equals"].pressed {
     height: 90vh;
   }
 }
+
+@media (max-width: 768px) {
+  body {
+    overflow: auto;
+  }
+  .calculator {
+    flex-direction: column;
+    width: 95vw;
+    height: auto;
+    padding: 15px;
+    gap: 15px;
+  }
+  .left-panel {
+    flex-direction: column;
+  }
+  .display {
+    min-height: 100px;
+    padding: 10px;
+  }
+  .expr {
+    font-size: 32px;
+  }
+  .result {
+    font-size: 18px;
+  }
+  .display.show-result .expr {
+    font-size: 20px;
+  }
+  .display.show-result .result {
+    font-size: 30px;
+  }
+  .history {
+    flex: none;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+  .keys {
+    flex: 1;
+  }
+  .keys button {
+    font-size: 24px;
+    padding: 15px;
+  }
+  .settings-panel {
+    width: 90vw;
+    right: -90vw;
+    top: 0;
+    transform: none;
+    height: 100vh;
+    border-radius: 0;
+  }
+  .settings-panel.open {
+    right: 0;
+  }
+  .about-panel {
+    width: 90vw;
+    right: -90vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+  .about-panel.open {
+    right: 0;
+  }
+  .welcome-content {
+    padding: 20px;
+    width: 90vw;
+    max-width: 400px;
+  }
+  .settings-btn {
+    top: 5px;
+    right: 5px;
+    font-size: 18px;
+    padding: 6px;
+  }
+}
 .about-panel {
   position: fixed;
   top: 0;
