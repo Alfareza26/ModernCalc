@@ -2,7 +2,7 @@
 
 **ModernCalc** adalah kalkulator web dengan desain futuristik dan pengaturan yang fleksibel, dikembangkan oleh **Alff Senpai & Saka.dlv**. Kalkulator ini dirancang untuk memberikan pengalaman perhitungan yang intuitif dengan fitur-fitur canggih seperti riwayat otomatis, kontrol keyboard penuh, dan opsi penyesuaian tema serta tampilan.
 
-[Live](https://alfareza26.github.io/ModernCalc/)
+[Pratinjau Live](https://alfareza26.github.io/ModernCalc/)
 
 ## ✨ Fitur Utama
 
@@ -20,13 +20,12 @@
 
 1. **Unduh atau Clone Repository**:
    ```
-   git clone https://github.com/username/moderncalc.git
+   git clone https://github.com/Alfareza26/moderncalc.git
    cd moderncalc
    ```
 
 2. **Buka di Browser**:
-   - Buka file `index.html` langsung di browser web favorit Anda (Chrome, Firefox, Edge, dll.).
-   - Tidak diperlukan server atau instalasi tambahan.
+   - Buka file `index.html` langsung di browser web favorit Anda (Chrome, Brave, Edge, dll.).
 
 3. **Mulai Menggunakan**:
    - Klik tombol "Mulai" pada overlay sambutan.
@@ -36,7 +35,7 @@
 
 ## 🎮 Kontrol Keyboard
 
-- **Angka dan Operator**: Ketik langsung angka (0-9), operator (+, -, *, :, %), dan titik desimal (.).
+- **Angka dan Operator**: Ketik langsung angka (0-9), operator (+, -, x, :, %), dan titik desimal (.).
 - **Enter**: Hitung hasil (=).
 - **Backspace**: Hapus karakter terakhir (⌫).
 - **C**: Hapus semua (AC).
