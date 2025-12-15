@@ -1,258 +1,306 @@
-(function () {
-  const exprEl = document.getElementById("expr");
-  const resultEl = document.getElementById("result");
-  const historyEl = document.getElementById("history");
-  const welcomeOverlay = document.getElementById("welcomeOverlay");
-  const startBtn = document.getElementById("startBtn");
-  const settingsBtn = document.getElementById("settingsBtn");
-  const settingsPanel = document.getElementById("settingsPanel");
-  const overlay = document.getElementById("overlay");
-  const closeSettings = document.getElementById("closeSettings");
-  const themeSel = document.getElementById("theme");
-  const fontSel = document.getElementById("fontsize");
-  const buttonShape = document.getElementById("buttonshape");
+let expr = "";
+let isFinal = false;
+const OPS = ["+", "-", "*", "/", "%", "^"];
+const history = [];
 
-  let expr = "";
-  let isFinal = false;
-  const history = [];
-  const OPS = ["+", "-", "*", "/", "%", "^"];
+const exprEl = document.getElementById("expr");
+const resultEl = document.getElementById("result");
+const historyPanel = document.getElementById("historyPanel");
+const overlay = document.getElementById("overlay");
+const welcomeOverlay = document.getElementById("welcomeOverlay");
+const startBtn = document.getElementById("startBtn");
 
-  startBtn.onclick = () => {
-    welcomeOverlay.classList.remove("show");
-    welcomeOverlay.style.display = "none";
-  };
+// Menu elements
+const menuBtn = document.getElementById("menuBtn");
+const mainMenuPanel = document.querySelector(".main-panel");
+const closeMainMenu = document.getElementById("closeMainMenu");
 
-  window.addEventListener("keydown", (e) => {
-    if (e.code === "Enter" && welcomeOverlay.classList.contains("show")) {
-      e.preventDefault();
-      startBtn.click();
-    }
-  });
+// Panel elements
+// const settingsBtn = document.getElementById("settingsBtn");
+// const settingsPanel = document.getElementById("settingsPanel");
+const closeSettings = document.getElementById("closeSettings");
+const historyBtn = document.getElementById("historyBtn");
+const closeHistory = document.getElementById("closeHistory");
+const aboutBtn = document.getElementById("aboutBtn");
+const closeAbout = document.getElementById("closeAbout");
+const aboutPanel = document.getElementById("aboutPanel");
 
-  settingsBtn.onclick = () => {
-    settingsPanel.classList.add("open");
-    overlay.style.display = "block";
-  };
-  closeSettings.onclick = overlay.onclick = () => {
-    settingsPanel.classList.remove("open");
-    overlay.style.display = "none";
-  };
+// Theme elements
+const themeSelect = document.getElementById("theme");
+const fontsizeSelect = document.getElementById("fontsize");
+const buttonshapeSelect = document.getElementById("buttonshape");
 
-  function formatNumber(num) {
-    if (num === "" || isNaN(num)) return num;
-    const [integerPart, decimalPart] = num.toString().split(".");
-    const formattedInt = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    return decimalPart ? `${formattedInt},${decimalPart}` : formattedInt;
-  }
+const CalcLogic = window.CalcLogic;
 
-  function render() {
+function render() {
   try {
-    let formattedExpr = expr
-      .replace(/\*/g, "x")
-      .replace(/\//g, ":")
-      .replace(/\d+(\.\d+)?/g, match => formatNumber(match));
+    let display = expr;
 
-    exprEl.textContent = formattedExpr || "0";
+    // ubah tampilan visual
+    display = display.replace(/sqrt\(/g, "√(")
+                     .replace(/\*/g, "×")
+                     .replace(/\//g, "÷");
 
-    if (!isFinal) {
-      const val = evalPercent(expr);
-      resultEl.textContent = isNaN(val) ? "0" : formatNumber(val);
+    display = display.replace(/\d+(\.\d+)?/g, m => CalcLogic.formatNumber(m));
+
+    exprEl.textContent = display || "0";
+
+    if (!isFinal && expr !== "") {
+      const val = CalcLogic.evaluate(expr);
+      resultEl.textContent = CalcLogic.formatNumber(val);
+    } else if (expr === "") {
+      resultEl.textContent = "";
     }
+
   } catch {
     exprEl.textContent = expr || "0";
-    resultEl.textContent = "0";
+    resultEl.textContent = "";
   }
 }
 
-
-
-  function evalPercent(expression) {
-    let expr = expression;
-    expr = expr.replace(/(\d+(?:\.\d+)?)\s*([\+\-\*\/])\s*(\d+(?:\.\d+)?)%/g, (_, num1, op, num2) => {
-      num1 = parseFloat(num1);
-      num2 = parseFloat(num2);
-      switch (op) {
-        case "+":
-        case "-":
-          return `${num1}${op}${(num1 * num2) / 100}`;
-        case "*":
-          return `${num1}*(${num2}/100)`;
-        case "/":
-          return `${num1}/(${num2}/100)`;
-        default:
-          return _;
-      }
-    });
-    expr = expr.replace(/(\d+(?:\.\d+)?)%/g, "($1/100)");
-    return Function('"use strict";return(' + expr + ")")();
+function append(v) {
+  if (isFinal) {
+    expr = "";
+    isFinal = false;
   }
 
-  function append(v) {
-    if (isFinal) {
-      expr = "";
-      isFinal = false;
-    }
+  const last = expr.slice(-1);
 
-    const last = expr.slice(-1);
-    if (OPS.includes(v) && OPS.includes(last)) {
-      expr = expr.slice(0, -1) + v;
-    } else {
-      expr += v;
-    }
-
-    resultEl.classList.remove("show");
-    render();
+  if (OPS.includes(v) && OPS.includes(last)) {
+    // Replace operator internal (expr)
+    expr = expr.slice(0, -1) + v;
+  } else {
+    expr += v;
   }
 
-
-  function handleFn(f) {
-    if (f === "clear") {
-      expr = "";
-      isFinal = false;
-      resultEl.classList.remove("show");
-      render();
-      return;
-    }
-    if (f === "back") {
-      expr = expr.slice(0, -1);
-      render();
-      return;
-    }
-    if (f === "paren") {
-      const o = (expr.match(/\(/g) || []).length;
-      const c = (expr.match(/\)/g) || []).length;
-      expr += o > c ? ")" : "(";
-      render();
-      return;
-    }
-    if (f === "equals") {
-      try {
-        const val = evalPercent(expr);
-        history.unshift(expr + " = " + val);
-        expr = String(val);
-        isFinal = true;
-        renderHistory();
-        render();
-
-        resultEl.classList.remove("show");
-        void resultEl.offsetWidth;
-        resultEl.classList.add("show");
-      } catch {
-        resultEl.textContent = "Not Found";
-      }
-    }
-  }
-  function renderHistory() {
-    historyEl.innerHTML = history
-      .map((h) => `<div class="hist-item">${h}</div>`)
-      .join("");
-
-    document.querySelectorAll(".hist-item").forEach((el) => {
-      el.onclick = () => {
-        const val = el.textContent.split(" = ")[1].replace(/\./g, "").replace(/,/g, ".");
-        expr = val;
-        isFinal = false;
-        render();
-      };
-    });
+  // Force update tampilan operator segera
+  if (v === "*") {
+    exprEl.textContent = expr.replace(/\*/g, "×");
+    return;
   }
 
-  document.querySelectorAll(".keys button").forEach((b) => {
-    b.onclick = () =>
-      b.dataset.value ? append(b.dataset.value) : handleFn(b.dataset.fn);
-  });
-
-  window.onkeydown = (e) => {
-    if (e.key === "Enter") return handleFn("equals");
-    if (e.key === "Backspace") return handleFn("back");
-    if (e.key.toLowerCase() === "c") return handleFn("clear");
-    if (/^[0-9+\-*/%^().]$/.test(e.key)) return append(e.key);
-  };
-
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "d") {
-      history.length = 0;
-      renderHistory();
-    }
-    if (e.ctrlKey && e.key.toLowerCase() === "m") {
-      historyEl.style.display =
-        historyEl.style.display === "none" ? "block" : "none";
-    }
-  });
-
-  themeSel.onchange = (e) => {
-    const v = e.target.value;
-    document.body.classList.remove("light-theme", "dark-theme");
-    if (v === "light") {
-      document.body.classList.add("light-theme");
-    } else if (v === "dark") {
-      document.body.classList.add("dark-theme");
-    } else {
-      document.body.removeAttribute("class");
-    }
-  };
-
-  fontSel.oninput = (e) =>
-    document.documentElement.style.setProperty(
-      "--font-size",
-      e.target.value + "px"
-    );
-
-  buttonShape.onchange = (e) => {
-    const v = e.target.value;
-    if (v === "round")
-      document.documentElement.style.setProperty("--button-radius", "50%");
-    else if (v === "square")
-      document.documentElement.style.setProperty("--button-radius", "0");
-    else
-      document.documentElement.style.setProperty("--button-radius", "10px");
-  };
-
-  const aboutBtn = document.getElementById("aboutBtn");
-  const aboutPanel = document.getElementById("aboutPanel");
-  const closeAbout = document.getElementById("closeAbout");
-
-  aboutBtn.onclick = () => {
-    aboutPanel.classList.add("open");
-    settingsPanel.classList.remove("open");
-    overlay.style.display = "block";
-  };
-  closeAbout.onclick = () => {
-    aboutPanel.classList.remove("open");
-    overlay.style.display = "none";
-  };
-  overlay.addEventListener("click", () => {
-    aboutPanel.classList.remove("open");
-  });
-
-  window.addEventListener("keydown", (e) => {
-    const key = e.key;
-    const btn = document.querySelector(
-      `.keys button[data-value="${key}"],
-       .keys button[data-fn="${key === "Enter" ? "equals" : key === "Backspace" ? "back" : ""}"]`
-    );
-
-    if (btn) {
-      btn.classList.add("pressed");
-      setTimeout(() => btn.classList.remove("pressed"), 200);
-    }
-  });
-  const exprDisplay = document.getElementById("expr");
-  const resultDisplay = document.getElementById("result");
-  const displayBox = document.querySelector(".display");
-
-
-
- 
-
-
-
-  document.querySelectorAll(".keys button[data-value]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      displayBox.classList.remove("show-result");
-    });
-  });
-
+  if (v === "/") {
+    exprEl.textContent = expr.replace(/\//g, "÷");
+    return;
+  }
 
   render();
-})();
+}
+
+function handleFn(fn) {
+  if (fn === "clear") {
+    expr = "";
+    isFinal = false;
+    render();
+    return;
+  }
+
+  if (fn === "back") {
+    expr = expr.slice(0, -1);
+    render();
+    return;
+  }
+
+  if (fn === "paren") {
+    const o = (expr.match(/\(/g) || []).length;
+    const c = (expr.match(/\)/g) || []).length;
+    expr += (o > c ? ")" : "(");
+    render();
+    return;
+  }
+
+  if (["sin", "cos", "tan", "sqrt"].includes(fn)) {
+    expr += fn + "(";
+    render();
+    return;
+  }
+
+  if (fn === "equals") {
+    try {
+      const rawExpr = expr; // simpan ekspresi asli
+      const val = CalcLogic.evaluate(rawExpr);
+
+      // simpan ke history (UI) menggunakan ekspresi asli
+      if (!isNaN(val)) {
+        history.unshift(`${rawExpr} = ${val}`);
+        expr = String(val); // expr sekarang hasil murni
+      }
+
+      isFinal = true;
+
+      renderHistory();
+
+      // render di delay agar UI tidak overwrite tampilan hasil
+      setTimeout(() => {
+        render();
+        resultEl.classList.add("show");
+      }, 10);
+
+    } catch (err) {
+      resultEl.textContent = "Error";
+      console.error(err);
+    }
+
+    return;
+  }
+}
+
+function renderHistory() {
+  historyPanel.innerHTML =
+    `<h2>History</h2>` +
+    history.map(h => `<div class='hist-item'>${h}</div>`).join("");
+
+  document.querySelectorAll(".hist-item").forEach(el => {
+    el.onclick = () => {
+      expr = el.textContent.split("=")[1].trim();
+      isFinal = false;
+      render();
+      historyPanel.classList.remove("open");
+      overlay.style.display = "none";
+    };
+  });
+}
+
+// Function to close all panels
+function closeAllPanels() {
+  mainMenuPanel.classList.remove("active");
+  // settingsPanel.classList.remove("open");
+  // historyPanel.classList.remove("open");
+  // aboutPanel.classList.remove("open");
+  overlay.classList.remove("active");
+}
+
+// Function to open a specific panel
+function openPanel(panel) {
+  // closeAllPanels();
+  panel.classList.add("open");
+  overlay.classList.add("active");
+}
+
+// Function to open main menu
+function openMainMenu() {
+  closeAllPanels();
+  mainMenuPanel.classList.add("active");
+  // menuBtn.classList.add('active');
+  overlay.classList.add("active");
+}
+
+document.querySelectorAll(".keys button").forEach(btn => {
+  const value = btn.dataset.value;
+  const fn = btn.dataset.fn;
+  btn.onclick = () => {
+    if (value) append(value);
+    if (fn) handleFn(fn);
+  };
+});
+
+startBtn.onclick = () => {
+  welcomeOverlay.style.display = "none";
+};
+
+render();
+
+// Overlay click handler
+overlay.onclick = () => {
+  closeAllPanels();
+};
+
+// Main menu button handlers
+menuBtn.onclick = () => {
+  openMainMenu();
+};
+
+closeMainMenu.onclick = () => {
+  closeAllPanels();
+};
+
+// Menu option handlers
+// settingsBtn.onclick = () => {
+//   openPanel(settingsPanel);
+// };
+
+closeSettings.onclick = () => {
+  closeAllPanels();
+};
+
+historyBtn.onclick = () => {
+  openPanel(historyPanel);
+};
+
+closeHistory.onclick = () => {
+  // closeAllPanels();
+  historyPanel.classList.remove('open');
+};
+
+aboutBtn.onclick = () => {
+  openPanel(aboutPanel);
+};
+
+closeAbout.onclick = () => {
+  // closeAllPanels();
+  aboutPanel.classList.remove('open');
+};
+
+// ====================================================
+//            THEME & SETTINGS FUNCTIONALITY           //
+// ====================================================
+
+// --- Theme Switching ---
+function setTheme(themeName) {
+  // Remove all potential theme classes
+  document.body.classList.remove('dark-theme', 'light-theme', 'blue-cyan-theme');
+  // Add the new theme class
+  document.body.classList.add(`${themeName}-theme`);
+  // Save the user's choice in localStorage
+  localStorage.setItem('calculatorTheme', themeName);
+}
+
+// --- Font Size Switching ---
+function setFontSize(size) {
+  document.documentElement.style.setProperty('--font-size', `${size}px`);
+  localStorage.setItem('calculatorFontSize', size);
+}
+
+// --- Button Shape Switching ---
+function setButtonShape(shape) {
+  document.documentElement.style.setProperty('--button-radius', 
+    shape === 'round' ? '50px' : 
+    shape === 'square' ? '0' : 
+    '10px' // default
+  );
+  localStorage.setItem('calculatorButtonShape', shape);
+}
+
+// --- Load saved settings on page load ---
+function loadSettings() {
+  // Load Theme
+  const savedTheme = localStorage.getItem('calculatorTheme') || 'blue-cyan'; // Default to blue-cyan
+  setTheme(savedTheme);
+  themeSelect.value = savedTheme;
+
+  // Load Font Size
+  const savedFontSize = localStorage.getItem('calculatorFontSize') || '18'; // Default to 18px
+  setFontSize(savedFontSize);
+  fontsizeSelect.value = savedFontSize;
+
+  // Load Button Shape
+  const savedButtonShape = localStorage.getItem('calculatorButtonShape') || 'default'; // Default to default
+  setButtonShape(savedButtonShape);
+  buttonshapeSelect.value = savedButtonShape;
+}
+
+// --- Event Listeners for Settings ---
+themeSelect.addEventListener('change', (e) => {
+  setTheme(e.target.value);
+});
+
+fontsizeSelect.addEventListener('change', (e) => {
+  setFontSize(e.target.value);
+});
+
+buttonshapeSelect.addEventListener('change', (e) => {
+  setButtonShape(e.target.value);
+});
+
+// --- Initial call to load settings when the script runs ---
+loadSettings();
