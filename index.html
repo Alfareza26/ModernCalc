@@ -4,69 +4,89 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Modern Calculator</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="style.css" />
   </head>
+
   <body class="blue-cyan-theme">
-    <div id="welcomeOverlay" class="welcome-overlay active">
-  <div class="welcome-content">
-    <h2>Selamat Datang 🎉</h2>
-    <p>Halo! Ini Project Kami</p>
-    <p>
-      Kalkulator modern dengan pengaturan canggih yang akan terus kami
-      kembangkan. Mohon maaf bila masih terdapat banyak kekurangan.
-    </p>
-    <button id="startBtn" class="start-btn">Mulai</button>
-  </div>
-</div>
-
-    <div class="overlay" id="overlay"></div>
-    <button class="settings-btn" id="menuBtn">
-      <img
-        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAADOUlEQVR4AZSUPY9QVRCG37mL2YTSb1drY2zFSkMgRgsT4y/QxkpXtBD9CxKkQt2WBP4AIRAaPgsqSCiBggQSwkeAhAIIBNjhmZlz7p4luwUn8/HOO3Pm3HPuuXcyMdLgX0vGSZthafJomsYCNd0Mt3S6nJRIcuWMNN64crWDwmWzqGBZ16r7Wcd4me5Ob1BaUwZbO8hKr6fIpKcdzPZKZqEK+w7Nw9jDHFS6lU5Je9o0/sIX3f3DDDDgHVk71EAjFjvbDkBc1C2hbxDUYq2+FggWTc50EniN4v2cyArne5p4Mzmbde7/UnAdPYUOYlq/gPuPkr6g6RYW28VefyYeBDaidGki2oX5Fd2CfsmCP+BnmV+y++pW2L/RlDyWRM0kkUYsLJXRBmOPu0cvUt6uKVCyPyUtoUhrBFI1uinpO/Sdpt+zyzu5hzSwa7IEtbuHtYPs55+S6Pzg/TbBZzbZUTO7N6H4I3DbmPag1m8z03lQH4ehpu3AA1qcf7ysCAa1P2h6u66GlSNrtnCDaX8BEZbCKp3th/+pCq29ZBI81dMFs98kPUEH8VNMGOIOPfodr0ad0yOz6Xf6PO1M3SLvYfqFsANVNUGu68ZTJRdmroacMQleMjbFfXWRv8H/9OBjcVGZPOYrVCNRmI9L+kY55qPbSp//XrgvJk3htNbIDrn0SyW4Ix3I9rLwuyw8MwHc/SPm7qVHhN2BbRn+AABhBzQFhPhlEuqViSv5vqSLNPwWfRN921eda6oLpN8it5Fc6X2G87U9TLjbq8EdRu0SOzgGcR+9Cz6Mf294CCiYmhQ9/ilC7RaR4xY9Nmn+QMCKzuojiRYkrm6NGd3u6NWJ2kFOkEgclHQefY6u8BR83f4I3KQ1XXMPZaJGK7R4Dj5nNkWPVm9tB22CanC+9gmLLfP17pPsc82DNgMm2kbdPnSZFh+Q2jlfD5KBawdkulB8C72aMUXgS4lHAx8huSvhQ6f4hUz2LHAqK4avBdqEILq+Qp3pfM5LoxOdC5/1xStxGrUjiop1On84yfJ0O3naFLBxdODpa4tsM613MLw6XBKmKfMaRhKZncmMkpeaU5wvpklWaEiqhuslAAAA//8EOJ+WAAAABklEQVQDAAhlB0l9iyW5AAAAAElFTkSuQmCC"
-      />
-    </button>
-
-    <div class="settings-panel main-panel" id="closeSettings">
-      <button class="close-settings" id="closeMainMenu">✖</button>
-      <h3>Pengaturan</h3>
-      <label>
-        Tema
-        <select id="theme">
-          <option value="blue-cyan">Blue Cyan</option>
-          <option value="dark">Dark</option>
-          <option value="light">Light</option>
-        </select>
-      </label>
-      <label>
-        Ukuran Font
-        <select id="fontsize">
-          <option value="14">14px</option>
-          <option value="16">16px</option>
-          <option value="18">18px</option>
-          <option value="20">20px</option>
-        </select>
-      </label>
-      <label>
-        Bentuk Tombol
-        <select id="buttonshape">
-          <option value="default">Default</option>
-          <option value="round">Bulat</option>
-          <option value="square">Kotak</option>
-        </select>
-      </label>
-
-      <hr style="border: none; border-top: 1px solid #444; margin: 10px 0" />
-      <button id="historyBtn" class="history-icon">📋</button>
-      <button id="aboutBtn" class="about-icon">i</button>
+    <!-- ================= WELCOME OVERLAY ================= -->
+    <div id="welcomeOverlay" class="welcome-overlay">
+      <div class="welcome-content">
+        <div>
+          <h2>Selamat Datang</h2>
+          <h4>Hello!! ini ModernCalc</h4>
+          <p>
+            Kalkulator modern dan canggih untuk perhitungan matematika, lengkap
+            dengan mode ilmiah dan kontrol keyboard.
+          </p>
+          <button id="startBtn" class="start-btn">Coba sekarang</button>
+        </div>
+      </div>
     </div>
 
+    <!-- ================= OVERLAY ================= -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- ================= MENU BUTTON ================= -->
+    <div class="btn-setting">
+      <button class="settings-btn" id="menuBtn">⚙</button>
+    </div>
+
+    <!-- ================= SETTINGS PANEL ================= -->
+    <div class="settings-panel main-panel" id="settingsPanel">
+      <button class="close-settings" id="closeMainMenu">✖</button>
+      <h3>Pengaturan</h3>
+
+      <div class="main-box-panel">
+        <label>
+          Tema
+          <select id="theme">
+            <option value="blue-cyan">Blue Cyan</option>
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="main-box-panel">
+        <label>
+          Ukuran Font
+          <select id="fontsize">
+            <option value="14">14px</option>
+            <option value="16">16px</option>
+            <option value="18">18px</option>
+            <option value="20">20px</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="main-box-panel">
+        <label>
+          Bentuk Tombol
+          <select id="buttonshape">
+            <option value="default">Default</option>
+            <option value="round">Bulat</option>
+            <option value="square">Kotak</option>
+          </select>
+        </label>
+      </div>
+      <div class="main-box-panel box-panel">
+        <div>
+          <button id="historyBtn"><i class='bx bx-history'></i><h4>History</h4></button>
+        <button id="aboutBtn"><i class='bx bx-user-pin' ></i><h4>About</h4></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= CALCULATOR ================= -->
     <div class="calculator">
       <div class="left-panel">
         <div class="display">
-          <div id="result" class="result"></div>
-          <div id="expr" class="expr"></div>
+          <div id="result" class="result">0</div>
+          <div id="expr" class="expr">0</div>
         </div>
       </div>
+
       <div class="keys">
         <button data-fn="sin">sin</button>
         <button data-fn="cos">cos</button>
@@ -76,13 +96,13 @@
 
         <button data-fn="sqrt">√</button>
         <button data-value="^">^</button>
-        
+
         <button data-value="7">7</button>
         <button data-value="8">8</button>
         <button data-value="9">9</button>
-        <button data-fn="paren">( )</button>  
+        <button data-fn="paren">( )</button>
         <button data-value="%">%</button>
-        
+
         <button data-value="4">4</button>
         <button data-value="5">5</button>
         <button data-value="6">6</button>
@@ -95,67 +115,45 @@
         <button data-value="-">−</button>
 
         <button data-value="+">+</button>
-        <button data-value=".">,</button>
+        <button data-value=".">.</button>
         <button data-value="0">0</button>
         <button data-fn="equals">=</button>
       </div>
     </div>
+
+    <!-- ================= HISTORY PANEL ================= -->
     <div class="history-panel" id="historyPanel">
       <button class="close-history" id="closeHistory">✖</button>
       <h2>📋 Riwayat Perhitungan</h2>
       <div id="history" class="history"></div>
     </div>
+
+    <!-- ================= ABOUT PANEL ================= -->
     <div class="about-panel" id="aboutPanel">
-      <button class="close-about" id="closeAbout">✖</button>
-      <h2>💡 Tentang Kalkulator Ini</h2>
+      <div>
+        <button class="close-about" id="closeAbout">✖</button>
+      <h2>💡 Tentang ModernCalc</h2>
+
       <p>
-        <strong>Alff Senpai & Saka.dlv</strong> mempersembahkan
-        <b>ModernCalc</b> — kalkulator web dengan desain futuristik dan
-        pengaturan yang fleksibel.
+        <strong>ModernCalc</strong> adalah kalkulator web modern dengan
+        perhitungan real-time, riwayat otomatis, dan kontrol keyboard penuh.
       </p>
 
       <ul>
-        <li>Perhitungan real-time</li>
-        <li>Riwayat hasil otomatis</li>
-        <li>Kontrol penuh lewat keyboard</li>
-        <li>Tema Unik</li>
-        <li>Ukuran font, dan bentuk tombol dapat diubah</li>
+        <li>✔ Mode ilmiah (sin, cos, tan, √, ^)</li>
+        <li>✔ Riwayat perhitungan</li>
+        <li>✔ Tema & tampilan fleksibel</li>
+        <li>✔ Kontrol keyboard penuh</li>
       </ul>
 
-      <p>
-        Versi: <span class="highlight">v1.0</span> | Diperbarui:
-        <span class="highlight">November 2025</span>
-      </p>
-
-      <div class="development-info">
-        <h3>📋 Tugas yang Selesai</h3>
-        <ul>
-          <li>✓ Menambahkan tombol operasi trigonometri (sin, cos, tan) ke HTML</li>
-          <li>✓ Menambahkan tombol eksponen (^) ke HTML</li>
-          <li>✓ Menambahkan tombol akar kuadrat (√) ke HTML</li>
-          <li>✓ Menyesuaikan tata letak menjadi 5 kolom di CSS</li>
-          <li>✓ Memperbarui kelas wide untuk tombol 0 dan =</li>
-          <li>✓ Menambahkan penanganan untuk fungsi baru di handleFn (sin, cos, tan, sqrt)</li>
-          <li>✓ Memperbarui evalPercent untuk mengganti fungsi trigonometri dengan Math yang setara</li>
-          <li>✓ Memperbarui evalPercent untuk mengganti ^ dengan **</li>
-          <li>✓ Memastikan ^ ada di array OPS</li>
-          <li>✓ Memperbaiki tata letak tombol untuk pengalaman pengguna yang lebih baik (mengelompokkan fungsi trigonometri, menambahkan gaya cyan untuk tombol ilmiah)</li>
-        </ul>
-
-        <h3>🚀 Langkah Selanjutnya</h3>
-        <ul>
-          <li>⏳ Menguji fungsi ilmiah baru untuk perhitungan yang benar</li>
-          <li>⏳ Memverifikasi penyesuaian tata letak pada berbagai ukuran layar</li>
-          <li>⏳ Memperbarui README jika perlu</li>
-        </ul>
-      </div>
-
       <p style="font-size: 12px; color: #aaa">
-        © 2025 Alff Senpai & Saka.dlv. Semua hak dilindungi.
+        © 2025 ModernCalc — All rights reserved
       </p>
+      </div>
     </div>
 
-    <script src="logic.js"></script>   
-    <script src="script.js"></script>   
+    <!-- ================= SCRIPTS ================= -->
+    <script src="script.js"></script>
+    <script src="logic.js"></script>
   </body>
 </html>
