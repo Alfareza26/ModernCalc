@@ -1,230 +1,190 @@
-// ================================================================
-// 🧠 CALCULATION LOGIC
-// ================================================================
-window.CalcLogic = {
+// ====================================================
+// 🧠 CALCULATION LOGIC (SAFE EVAL)
+// ====================================================
+const CalcLogic = {
   evaluate(rawExpr) {
-    if (!rawExpr || rawExpr.trim() === "") return NaN;
+    if (!rawExpr) return NaN;
 
     let expr = rawExpr;
 
-    // Trigonometri (degree → radian)
-    expr = expr.replace(/sin\(([^)]+)\)/g, "Math.sin(($1) * Math.PI / 180)");
-    expr = expr.replace(/cos\(([^)]+)\)/g, "Math.cos(($1) * Math.PI / 180)");
-    expr = expr.replace(/tan\(([^)]+)\)/g, "Math.tan(($1) * Math.PI / 180)");
-
-    // Akar (√9)
-    expr = expr.replace(/√(\d+(\.\d+)?)/g, "Math.sqrt($1)");
-
-    // Pangkat
+    expr = expr.replace(/√/g, "Math.sqrt");
+    expr = expr.replace(/sin\(([^()]+)\)/g, "Math.sin(($1)*Math.PI/180)");
+    expr = expr.replace(/cos\(([^()]+)\)/g, "Math.cos(($1)*Math.PI/180)");
+    expr = expr.replace(/tan\(([^()]+)\)/g, "Math.tan(($1)*Math.PI/180)");
     expr = expr.replace(/\^/g, "**");
+    expr = expr.replace(/%/g, "/100");
 
-    // Persen
-    expr = expr.replace(/(\d+(\.\d+)?)%/g, "($1/100)");
-
-    const result = Function('"use strict"; return (' + expr + ')')();
-    return this.round(result);
-  },
-
-  formatNumber(num) {
-    if (num === "" || num === null || isNaN(num)) return num;
-    const [a, b] = num.toString().split(".");
-    const i = a.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    return b ? `${i},${b}` : i;
-  },
-
-  round(num, decimals = 10) {
-    if (!isFinite(num)) return NaN;
-    const f = Math.pow(10, decimals);
-    return Math.round(num * f) / f;
+    try {
+      return Function(`"use strict"; return (${expr})`)();
+    } catch {
+      return NaN;
+    }
   }
 };
 
-// ================================================================
-// 🖥️ UI STATE
-// ================================================================
-let currentInput = "";
-let isFinal = false;
+// ====================================================
+// 📌 ELEMENTS
+// ====================================================
 const exprEl = document.getElementById("expr");
 const resultEl = document.getElementById("result");
+const keys = document.querySelector(".keys");
 
-exprEl.textContent = "0";
-resultEl.textContent = "0";
+const overlay = document.getElementById("overlay");
+const settingsPanel = document.getElementById("settingsPanel");
+const historyPanel = document.getElementById("historyPanel");
+const aboutPanel = document.getElementById("aboutPanel");
+const historyEl = document.getElementById("history");
+const welcomeOverlay = document.getElementById("welcomeOverlay");
 
-// ================================================================
-// 🎯 UI FUNCTIONS
-// ================================================================
-function updateExpr() {
-  exprEl.textContent = currentInput || "0";
+// ====================================================
+// 📦 STATE
+// ====================================================
+let expression = "";
+let history = [];
+
+// ====================================================
+// 🖥️ DISPLAY
+// ====================================================
+function updateDisplay() {
+  exprEl.textContent = expression || "0";
+  const res = CalcLogic.evaluate(expression);
+  resultEl.textContent = isNaN(res) ? "0" : res;
 }
 
-function updateResult(v) {
-  resultEl.textContent = CalcLogic.formatNumber(v);
-}
-function isPreviewSafe(expr) {
-  if (!expr) return false;
-  if (/^[+\-*/^.]$/.test(expr)) return false;
-  if (/[+\-*/^.]$/.test(expr)) return false;
-  if (/√$/.test(expr)) return false;
-  if (/(sin|cos|tan)\($/.test(expr)) return false;
-  return true;
-}
-
-function previewResult() {
-  if (!isPreviewSafe(currentInput)) {
-    resultEl.textContent = "0";
-    resultEl.classList.remove("final");
-    return;
-  }
-
-  try {
-    const r = CalcLogic.evaluate(currentInput);
-    if (!isFinite(r)) return;
-
-    resultEl.textContent = CalcLogic.formatNumber(r);
-    resultEl.classList.remove("final");
-
-  } catch {
-    resultEl.textContent = "0";
-  }
-}
-
-
-function appendValue(v) {
-  if (isFinal && /[0-9.]/.test(v)) {
-    currentInput = "";
-  }
-
-  isFinal = false;
-  currentInput += v;
-
-  updateExpr();
-  previewResult();
-}
-
-
-function deleteLast() {
-  isFinal = false;
-  currentInput = currentInput.slice(0, -1);
-  updateExpr();
-  previewResult();
+// ====================================================
+// ✏️ INPUT HANDLERS
+// ====================================================
+function addValue(val) {
+  expression += val;
+  updateDisplay();
 }
 
 function clearAll() {
-  currentInput = "";
-  isFinal = false;
-  exprEl.textContent = "0";
-  resultEl.textContent = "0";
-  resultEl.classList.remove("final");
+  expression = "";
+  updateDisplay();
 }
 
-// ================================================================
-// ✅ VALIDATION
-// ================================================================
-function isExpressionValid(expr) {
-  if (!expr) return false;
-  if (/[+\-*/^.]$/.test(expr)) return false;
-  if (/√$/.test(expr)) return false;
-
-  const o = (expr.match(/\(/g)||[]).length;
-  const c = (expr.match(/\)/g)||[]).length;
-  if (o !== c) return false;
-
-  return true;
+function backspace() {
+  expression = expression.slice(0, -1);
+  updateDisplay();
 }
 
-// ================================================================
-// 🧮 CALCULATE
-// ================================================================
+function addParen() {
+  const open = (expression.match(/\(/g) || []).length;
+  const close = (expression.match(/\)/g) || []).length;
+  expression += open > close ? ")" : "(";
+  updateDisplay();
+}
+
+function addFn(fn) {
+  expression += fn + "(";
+  updateDisplay();
+}
+
+// ====================================================
+// 🟰 CALCULATE & HISTORY
+// ====================================================
 function calculate() {
-  if (!isExpressionValid(currentInput)) {
-    resultEl.textContent = "Error";
-    return;
-  }
+  const res = CalcLogic.evaluate(expression);
+  if (isNaN(res)) return;
 
-  try {
-    const r = CalcLogic.evaluate(currentInput);
-    if (!isFinite(r)) throw 0;
+  history.unshift(`${expression} = ${res}`);
+  if (history.length > 20) history.pop();
 
-    resultEl.textContent = CalcLogic.formatNumber(r);
-    resultEl.classList.add("final");
-
-    currentInput = r.toString();
-    updateExpr();
-    isFinal = true;
-
-  } catch {
-    resultEl.textContent = "Error";
-  }
+  renderHistory();
+  expression = String(res);
+  updateDisplay();
 }
 
+function renderHistory() {
+  historyEl.innerHTML = history
+    .map(item => `<div class="history-item">${item}</div>`)
+    .join("");
+}
 
+// ====================================================
+// 🧩 BUTTON EVENTS
+// ====================================================
+keys.addEventListener("click", e => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
 
+  const val = btn.dataset.value;
+  const fn = btn.dataset.fn;
 
-// ================================================================
-// 🧩 BUTTON CLICK HANDLER
-// ================================================================
-document.querySelectorAll(".keys button").forEach(btn=>{
-  btn.onclick=()=>{
-    const v = btn.dataset.value;
-    const f = btn.dataset.fn;
-
-    if (v) return appendValue(v);
-
-    if (f==="sin") appendValue("sin(");
-    if (f==="cos") appendValue("cos(");
-    if (f==="tan") appendValue("tan(");
-    if (f==="sqrt") appendValue("√");
-    if (f==="paren") appendValue("(");
-    if (f==="back") deleteLast();
-    if (f==="clear") clearAll();
-    if (f==="equals") calculate();
-  };
+  if (val) addValue(val);
+  else if (fn === "clear") clearAll();
+  else if (fn === "back") backspace();
+  else if (fn === "equals") calculate();
+  else if (fn === "paren") addParen();
+  else if (fn === "sqrt") addValue("√(");
+  else if (["sin", "cos", "tan"].includes(fn)) addFn(fn);
 });
 
-// ================================================================
-// ⌨️ KEYBOARD SUPPORT (FULL + NUMPAD)
-// ================================================================
-document.addEventListener("keydown",e=>{
-  if (e.repeat) return;
-  if (["INPUT","TEXTAREA"].includes(document.activeElement.tagName)) return;
-
-  const k=e.key,c=e.code;
-
-  if (k==="Enter") {
-    e.preventDefault();
-    calculate();
-    return;
-  }
-
-  if (c.startsWith("Numpad") && !isNaN(k)) return appendValue(k);
-  if (["+","-","*","/","^","."].includes(k)) return appendValue(k);
-  if (!isNaN(k)) return appendValue(k);
-
-  if (k==="Backspace") return deleteLast();
-  if (k==="Escape") return clearAll();
-
-  if (e.ctrlKey) {
-    if (k==="s") appendValue("sin(");
-    if (k==="c") appendValue("cos(");
-    if (k==="t") appendValue("tan(");
-    if (k==="r") appendValue("√");
-  }
+// ====================================================
+// ⌨️ KEYBOARD SUPPORT
+// ====================================================
+document.addEventListener("keydown", e => {
+  if (/[0-9+\-*/.%]/.test(e.key)) addValue(e.key);
+  if (e.key === "Enter") calculate();
+  if (e.key === "Backspace") backspace();
+  if (e.key === "Escape") clearAll();
+  if (e.key === "(" || e.key === ")") addValue(e.key);
 });
 
-// ================================================================
-// 🎬 WELCOME OVERLAY
-// ================================================================
-document.addEventListener("DOMContentLoaded", () => {
-  const startBtn = document.getElementById("startBtn");
-  const welcomeOverlay = document.getElementById("welcomeOverlay");
-
-  if (!startBtn || !welcomeOverlay) return;
-
-  startBtn.onclick = () => {
-    welcomeOverlay.classList.add("native");
-    setTimeout(() => {
-      welcomeOverlay.style.zIndex = "-1";
-      welcomeOverlay.style.pointerEvents = "none";
-    }, 1000);
-  };
+// ====================================================
+// 🎨 SETTINGS
+// ====================================================
+document.getElementById("theme").addEventListener("change", e => {
+  document.body.className = e.target.value + "-theme";
 });
+
+document.getElementById("fontsize").addEventListener("change", e => {
+  document.documentElement.style.fontSize = e.target.value + "px";
+});
+
+document.getElementById("buttonshape").addEventListener("change", e => {
+  document.body.dataset.shape = e.target.value;
+});
+
+// ====================================================
+// 📂 PANELS
+// ====================================================
+function closePanels() {
+  [settingsPanel, historyPanel, aboutPanel].forEach(p =>
+    p.classList.remove("active")
+  );
+  overlay.classList.remove("show");
+}
+
+document.getElementById("menuBtn").onclick = () => {
+  settingsPanel.classList.add("active");
+  overlay.classList.add("show");
+};
+
+document.getElementById("historyBtn").onclick = () => {
+  historyPanel.classList.add("active");
+  overlay.classList.add("show");
+};
+
+document.getElementById("aboutBtn").onclick = () => {
+  aboutPanel.classList.add("active");
+  overlay.classList.add("show");
+};
+
+document.getElementById("closeMainMenu").onclick = closePanels;
+document.getElementById("closeHistory").onclick = closePanels;
+document.getElementById("closeAbout").onclick = closePanels;
+overlay.onclick = closePanels;
+
+// ====================================================
+// 👋 WELCOME OVERLAY
+// ====================================================
+document.getElementById("startBtn").onclick = () => {
+  welcomeOverlay.style.display = "none";
+};
+
+// ====================================================
+// 🚀 INIT
+// ====================================================
+updateDisplay();

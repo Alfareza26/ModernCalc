@@ -1,0 +1,4 @@
+- [x] Remove duplicated state, DOM elements, render functions, input handlers, button events, keyboard events from logic.js
+- [x] Improve CalcLogic.evaluate to handle nested functions by defining helper functions inside the evaluation context
+- [x] Ensure logic.js only contains the CalcLogic object
+- [x] Test that preview and operations work correctly after changes
