@@ -17,12 +17,37 @@ const startBtn = document.getElementById("startBtn");
 let expression = "";
 let history = [];
 
+function formatDisplay(expr) {
+  if (!expr) return "0";
+
+  return expr
+    .replace(/Math\.sqrt\(/g, "√")
+    .replace(/√\(/g, "√")
+    .replace(/\*/g, "×")
+    .replace(/\//g, "÷")
+    .replace(/\)/g, ""); // ❌ DIHAPUS TOTAL
+}
 // ================= DISPLAY =================
 function updateDisplay() {
-  exprEl.textContent = expression || "0";
-  const res = window.CalcLogic.evaluate(expression);
+  exprEl.textContent = formatDisplay(expression);
+
+  if (!window.CalcLogic || !expression) {
+    resultEl.textContent = "0";
+    return;
+  }
+
+  // 🧠 AUTO CLOSE KURUNG UNTUK PREVIEW
+  let tempExpr = expression;
+  const open = (tempExpr.match(/\(/g) || []).length;
+  const close = (tempExpr.match(/\)/g) || []).length;
+  if (open > close) {
+    tempExpr += ")".repeat(open - close);
+  }
+
+  const res = window.CalcLogic.evaluate(tempExpr);
   resultEl.textContent = isNaN(res) ? "0" : res;
 }
+
 
 // ================= INPUT =================
 function addValue(val) {
