@@ -1,93 +1,152 @@
-// ====================================================
-// 📌 ELEMENTS
-// ====================================================
-const body = document.body;
+"use strict";
+
+// ================= ELEMENTS =================
+const exprEl = document.getElementById("expr");
+const resultEl = document.getElementById("result");
+const keys = document.querySelector(".keys");
 
 const overlay = document.getElementById("overlay");
-const welcomeOverlay = document.getElementById("welcomeOverlay");
-
 const settingsPanel = document.getElementById("settingsPanel");
 const historyPanel = document.getElementById("historyPanel");
 const aboutPanel = document.getElementById("aboutPanel");
-
-const menuBtn = document.getElementById("menuBtn");
-const closeMainMenu = document.getElementById("closeMainMenu");
-const historyBtn = document.getElementById("historyBtn");
-const closeHistory = document.getElementById("closeHistory");
-const aboutBtn = document.getElementById("aboutBtn");
-const closeAbout = document.getElementById("closeAbout");
-
+const historyEl = document.getElementById("history");
+const welcomeOverlay = document.getElementById("welcomeOverlay");
 const startBtn = document.getElementById("startBtn");
 
-const themeSelect = document.getElementById("theme");
-const fontSizeSelect = document.getElementById("fontsize");
-const buttonShapeSelect = document.getElementById("buttonshape");
+// ================= STATE =================
+let expression = "";
+let history = [];
 
-// ====================================================
-// 🧭 PANEL CONTROL
-// ====================================================
-function openPanel(panel) {
-  panel.classList.add("active");
-  overlay.classList.add("show");
+// ================= DISPLAY =================
+function updateDisplay() {
+  exprEl.textContent = expression || "0";
+  const res = window.CalcLogic.evaluate(expression);
+  resultEl.textContent = isNaN(res) ? "0" : res;
 }
 
-function closeAllPanels() {
-  [settingsPanel, historyPanel, aboutPanel].forEach(p =>
-    p.classList.remove("active")
-  );
-  overlay.classList.remove("show");
+// ================= INPUT =================
+function addValue(val) {
+  expression += val;
+  updateDisplay();
 }
 
-// ====================================================
-// ⚙ SETTINGS PANEL
-// ====================================================
-menuBtn.onclick = () => openPanel(settingsPanel);
-closeMainMenu.onclick = closeAllPanels;
+function clearAll() {
+  expression = "";
+  updateDisplay();
+}
 
-// ====================================================
-// 📜 HISTORY PANEL
-// ====================================================
-historyBtn.onclick = () => openPanel(historyPanel);
-closeHistory.onclick = closeAllPanels;
+function backspace() {
+  expression = expression.slice(0, -1);
+  updateDisplay();
+}
 
-// ====================================================
-// 💡 ABOUT PANEL
-// ====================================================
-aboutBtn.onclick = () => openPanel(aboutPanel);
-closeAbout.onclick = closeAllPanels;
+function addParen() {
+  const open = (expression.match(/\(/g) || []).length;
+  const close = (expression.match(/\)/g) || []).length;
+  expression += open > close ? ")" : "(";
+  updateDisplay();
+}
 
-// ====================================================
-// 🌫 OVERLAY CLICK
-// ====================================================
-overlay.onclick = closeAllPanels;
+function addFn(fn) {
+  expression += fn + "(";
+  updateDisplay();
+}
 
-// ====================================================
-// 🎨 THEME SYSTEM
-// ====================================================
-themeSelect.onchange = e => {
-  body.className = e.target.value + "-theme";
+// ================= CALCULATE =================
+function calculate() {
+  const res = window.CalcLogic.evaluate(expression);
+  if (isNaN(res)) return;
+
+  history.unshift(`${expression} = ${res}`);
+  if (history.length > 20) history.pop();
+
+  renderHistory();
+  expression = String(res);
+  updateDisplay();
+}
+
+function renderHistory() {
+  historyEl.innerHTML = history
+    .map(h => `<div class="history-item">${h}</div>`)
+    .join("");
+}
+
+// ================= BUTTONS =================
+keys.addEventListener("click", e => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+
+  const val = btn.dataset.value;
+  const fn = btn.dataset.fn;
+
+  if (val) addValue(val);
+  else if (fn === "clear") clearAll();
+  else if (fn === "back") backspace();
+  else if (fn === "equals") calculate();
+  else if (fn === "paren") addParen();
+  else if (fn === "sqrt") addValue("√(");
+  else if (["sin", "cos", "tan"].includes(fn)) addFn(fn);
+});
+
+// ================= KEYBOARD =================
+document.addEventListener("keydown", e => {
+  if (/[0-9+\-*/.%]/.test(e.key)) addValue(e.key);
+  if (e.key === "Enter") calculate();
+  if (e.key === "Backspace") backspace();
+  if (e.key === "Escape") clearAll();
+  if (e.key === "(" || e.key === ")") addValue(e.key);
+});
+
+// ================= SETTINGS =================
+document.getElementById("theme").onchange = e => {
+  document.body.className = e.target.value + "-theme";
 };
 
-// ====================================================
-// 🔠 FONT SIZE SYSTEM
-// ====================================================
-fontSizeSelect.onchange = e => {
+document.getElementById("fontsize").onchange = e => {
   document.documentElement.style.fontSize = e.target.value + "px";
 };
 
-// ====================================================
-// 🔘 BUTTON SHAPE SYSTEM
-// ====================================================
-buttonShapeSelect.onchange = e => {
-  body.dataset.shape = e.target.value;
+document.getElementById("buttonshape").onchange = e => {
+  document.body.dataset.shape = e.target.value;
 };
 
-// ====================================================
-// 👋 WELCOME OVERLAY
-// ====================================================
+// ================= PANELS =================
+function closePanels() {
+  settingsPanel.classList.remove("active");
+  historyPanel.classList.remove("active");
+  aboutPanel.classList.remove("active");
+  overlay.classList.remove("show");
+}
+
+document.getElementById("menuBtn").onclick = () => {
+  settingsPanel.classList.add("active");
+  overlay.classList.add("show");
+};
+
+document.getElementById("historyBtn").onclick = () => {
+  historyPanel.classList.add("active");
+  overlay.classList.add("show");
+};
+
+document.getElementById("aboutBtn").onclick = () => {
+  aboutPanel.classList.add("active");
+  overlay.classList.add("show");
+};
+
+document.getElementById("closeMainMenu").onclick =
+document.getElementById("closeHistory").onclick =
+document.getElementById("closeAbout").onclick = closePanels;
+
+overlay.onclick = closePanels;
+
+// ================= WELCOME =================
 startBtn.onclick = () => {
   welcomeOverlay.classList.add("hide");
   setTimeout(() => {
     welcomeOverlay.style.display = "none";
   }, 300);
 };
+
+// ================= INIT =================
+updateDisplay();
+console.log("ModernCalc ready");
