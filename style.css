@@ -169,16 +169,18 @@ body.blue-cyan-theme {
 /* Display Section */
 .display {
   width: 100%;
-  padding: 50% 15px;
+  height: 100%;
+  /* padding: 50% 15px; */
   background: #201f44;
   box-sizing: border-box;
+  padding-right: 40px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  align-items: flex-end;
+  justify-content: center;
+  align-items: end;
   border: 2px solid var(--border-color, #333);
   border-radius: 15px;
-  min-height: 130px;
+  /* min-height: 130px; */
   overflow-x: auto;
   overflow-y: hidden;
   /* background: var(--calc-glass); */
@@ -354,7 +356,7 @@ body.blue-cyan-theme {
   cursor: pointer;
   border: 1px solid var(--calc-muted);
   background: var(--calc-glass);
-  color: #ffffff;
+  color: var(--body-text);
 }
 .settings-panel select:hover,
 .settings-panel input:hover,
@@ -387,6 +389,9 @@ body.blue-cyan-theme {
   flex-direction: column;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
 }
+.main-box-panel option{
+  color: var(--body-text);
+}
 .box-panel>div{
   display: flex;
   gap: 10px;
@@ -398,12 +403,16 @@ body.blue-cyan-theme {
   cursor: pointer;
   align-items: center;
 }
+.box-panel button h4{
+  color: var(--body-text);
+}
 .box-panel button:hover{
   background: var(--body-bg-top);
 }
 .box-panel i{
   padding: 0 16px;
-  font-size: 21px
+  font-size: 21px;
+  color: var(--body-text);
 }
 /* History Panel */
 .history-panel {
