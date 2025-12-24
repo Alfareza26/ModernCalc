@@ -115,12 +115,39 @@ keys.addEventListener("click", e => {
 
 // ================= KEYBOARD =================
 document.addEventListener("keydown", e => {
-  if (/[0-9+\-*/.%]/.test(e.key)) addValue(e.key);
-  if (e.key === "Enter") calculate();
-  if (e.key === "Backspace") backspace();
-  if (e.key === "Escape") clearAll();
-  if (e.key === "(" || e.key === ")") addValue(e.key);
+  const key = e.key;
+
+  // 🔢 angka & operator
+  if (/[0-9+\-*/.%]/.test(key)) {
+    addValue(key);
+    return;
+  }
+
+  // 🧮 kurung
+  if (key === "(" || key === ")") {
+    addValue(key);
+    return;
+  }
+
+  // ⌫ backspace
+  if (key === "Backspace") {
+    backspace();
+    return;
+  }
+
+  // 🟰 enter
+  if (key === "Enter") {
+    calculate();
+    return;
+  }
+
+  // 🧹 clear (C / c / Esc)
+  if (key === "Escape" || key.toLowerCase() === "c") {
+    clearAll();
+    return;
+  }
 });
+
 
 // ================= SETTINGS =================
 document.getElementById("theme").onchange = e => {
