@@ -148,6 +148,23 @@ document.addEventListener("keydown", e => {
   }
 });
 
+function closeWelcome() {
+  if (!welcomeOverlay) return;
+
+  welcomeOverlay.classList.add("hide");
+
+  // tunggu animasi (jika ada)
+  setTimeout(() => {
+    welcomeOverlay.style.display = "none";
+  }, 300);
+
+  // cleanup listener
+  document.removeEventListener("click", closeWelcome);
+  document.removeEventListener("keydown", closeWelcome);
+  document.removeEventListener("wheel", closeWelcome);
+}
+
+
 
 // ================= SETTINGS =================
 document.getElementById("theme").onchange = e => {
