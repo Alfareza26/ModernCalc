@@ -1,8 +1,6 @@
 # ModernCalc - Kalkulator Modern Web
 
-**ModernCalc** adalah kalkulator web dengan desain futuristik dan pengaturan yang fleksibel, dikembangkan oleh **Alff Senpai & Saka.dlv**. Kalkulator ini dirancang untuk memberikan pengalaman perhitungan yang intuitif dengan fitur-fitur canggih seperti riwayat otomatis, kontrol keyboard penuh, dan opsi penyesuaian tema serta tampilan.
-
- [Pratinjau Live](https://alfareza26.github.io/ModernCalc/)
+**ModernCalc** adalah kalkulator web dengan desain futuristik dan pengaturan yang fleksibel & responsif, dikembangkan oleh **Alff Senpai & Saka.dlv**. Kalkulator ini dirancang untuk memberikan pengalaman perhitungan yang intuitif dengan fitur-fitur canggih seperti riwayat otomatis, kontrol keyboard penuh, dan opsi penyesuaian tema serta tampilan.
 
 ## ✨ Fitur Utama
 
@@ -24,7 +22,7 @@
    cd moderncalc
    ```
    
-   Atau menggunakan Link yang saya Sematkan
+   Atau menggunakan Link pada bagian **About**
 
 2. **Buka di Browser**:
    - Buka file `index.html` langsung di browser web favorit Anda (Chrome, Brave, Edge, dll.).
@@ -41,8 +39,6 @@
 - **Enter**: Hitung hasil (=).
 - **Backspace**: Hapus karakter terakhir (⌫).
 - **C**: Hapus semua (AC).
-- **D**: Hapus riwayat (tekan D).
-- **Ctrl + M**: Sembunyikan/Tampilkan riwayat.
 
 ## 🛠️ Teknologi yang Digunakan
 
@@ -62,9 +58,10 @@ Proyek ini dilisensikan di bawah **MIT License**. Lihat file `LICENSE` untuk det
 ## 🔄 Pembaruan
 
 - **Versi 1.0** (November 2025): Rilis awal dengan fitur lengkap.
+- **Versi 1.1** (Desember 2025): Perbaikan UI dan Fitur 
 - Kami terus mengembangkan proyek ini. Jika ada saran atau laporan bug, silakan buat issue di repository.
 
 ---
 
 **© 2025 Alff Senpai & Saka.dlv. Semua hak dilindungi.**  
-*Mohon maaf jika masih terdapat kekurangan. Kritik dan saran sangat diterima!*
+*Mohon maaf jika masih terdapat kekurangan. Kritik dan saran siap kami terima!*
