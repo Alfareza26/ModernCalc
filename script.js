@@ -23,10 +23,11 @@ function formatDisplay(expr) {
   return expr
     .replace(/Math\.sqrt\(/g, "√")
     .replace(/√\(/g, "√")
-    .replace(/\*/g, "×")
-    .replace(/\//g, "÷")
-    .replace(/\)/g, ""); // ❌ DIHAPUS TOTAL
+    .replace(/\*/g, "x")
+    .replace(/\//g, ":")
+    .replace(/\)/g, ")"); // tanda tutup tidak ditampilkan
 }
+
 // ================= DISPLAY =================
 function updateDisplay() {
   exprEl.textContent = formatDisplay(expression);
@@ -35,6 +36,24 @@ function updateDisplay() {
     resultEl.textContent = "0";
     return;
   }
+
+  let tempExpr = expression;
+  const open = (tempExpr.match(/\(/g) || []).length;
+  const close = (tempExpr.match(/\)/g) || []).length;
+  if (open > close) {
+    tempExpr += ")".repeat(open - close);
+  }
+
+  const res = window.CalcLogic.evaluate(tempExpr);
+
+  if (Number.isNaN(res)) {
+    resultEl.textContent = "Error";
+    return;
+  }
+
+  resultEl.textContent = res;
+}
+
 
   // 🧠 AUTO CLOSE KURUNG UNTUK PREVIEW
   let tempExpr = expression;
@@ -46,14 +65,25 @@ function updateDisplay() {
 
   const res = window.CalcLogic.evaluate(tempExpr);
   resultEl.textContent = isNaN(res) ? "0" : res;
-}
 
+
+function canAddOperator(op) {
+  if (!expression) return op === "-";
+
+  const last = expression.slice(-1);
+  return !/[+\-*/.%]/.test(last);
+}
 
 // ================= INPUT =================
 function addValue(val) {
+  if (/[+\-*/.%]/.test(val)) {
+    if (!canAddOperator(val)) return;
+  }
+
   expression += val;
   updateDisplay();
 }
+
 
 function clearAll() {
   expression = "";
@@ -80,9 +110,13 @@ function addFn(fn) {
 // ================= CALCULATE =================
 function calculate() {
   const res = window.CalcLogic.evaluate(expression);
-  if (isNaN(res)) return;
+  if (Number.isNaN(res)) return;
 
-  history.unshift(`${expression} = ${res}`);
+  history.unshift({
+    expr: expression,
+    result: res
+  });
+
   if (history.length > 20) history.pop();
 
   renderHistory();
@@ -90,11 +124,27 @@ function calculate() {
   updateDisplay();
 }
 
+// ================= HISTORY =================
 function renderHistory() {
   historyEl.innerHTML = history
-    .map(h => `<div class="history-item">${h}</div>`)
+    .map((h, i) =>
+      `<div class="history-item" data-index="${i}">
+        ${formatDisplay(h.expr)} = ${h.result}
+      </div>`
+    )
     .join("");
 }
+historyEl.addEventListener("click", e => {
+  const item = e.target.closest(".history-item");
+  if (!item) return;
+
+  const index = item.dataset.index;
+  if (index === undefined) return;
+
+  expression = history[index].expr;
+  updateDisplay();
+});
+
 
 // ================= BUTTONS =================
 keys.addEventListener("click", e => {
@@ -115,55 +165,48 @@ keys.addEventListener("click", e => {
 
 // ================= KEYBOARD =================
 document.addEventListener("keydown", e => {
-  const key = e.key;
+  const allowed = [
+    "0","1","2","3","4","5","6","7","8","9",
+    "+","-","*","/","%",".",
+    "(",")"
+  ];
 
-  // 🔢 angka & operator
-  if (/[0-9+\-*/.%]/.test(key)) {
-    addValue(key);
+  const digitCount = (expression.match(/[0-9]/g) || []).length;
+
+  if (/[0-9]/.test(e.key)) {
+    if (digitCount >= 27) {
+      e.preventDefault();
+      return;
+    }
+    addValue(e.key);
     return;
   }
 
-  // 🧮 kurung
-  if (key === "(" || key === ")") {
-    addValue(key);
+  if (allowed.includes(e.key)) {
+    addValue(e.key);
     return;
   }
 
-  // ⌫ backspace
-  if (key === "Backspace") {
-    backspace();
-    return;
-  }
-
-  // 🟰 enter
-  if (key === "Enter") {
+  if (e.key === "Enter") {
+    e.preventDefault();
     calculate();
     return;
   }
 
-  // 🧹 clear (C / c / Esc)
-  if (key === "Escape" || key.toLowerCase() === "c") {
+  if (e.key === "Backspace") {
+    e.preventDefault();
+    backspace();
+    return;
+  }
+
+  if (e.key === "c") {
+    e.preventDefault();
     clearAll();
     return;
   }
+
+  e.preventDefault();
 });
-
-function closeWelcome() {
-  if (!welcomeOverlay) return;
-
-  welcomeOverlay.classList.add("hide");
-
-  // tunggu animasi (jika ada)
-  setTimeout(() => {
-    welcomeOverlay.style.display = "none";
-  }, 300);
-
-  // cleanup listener
-  document.removeEventListener("click", closeWelcome);
-  document.removeEventListener("keydown", closeWelcome);
-  document.removeEventListener("wheel", closeWelcome);
-}
-
 
 
 // ================= SETTINGS =================
@@ -215,6 +258,24 @@ startBtn.onclick = () => {
     welcomeOverlay.style.display = "none";
   }, 300);
 };
+// ================= WALLPAPER (STATIC) =================
+const wallpaperInput = document.getElementById("wallpaperInput");
+const display = document.querySelector(".display");
+
+wallpaperInput.addEventListener("change", () => {
+  const file = wallpaperInput.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    display.style.backgroundImage = `url(${reader.result})`;
+    display.style.backgroundSize = "cover";
+    display.style.backgroundPosition = "center";
+    display.style.backgroundRepeat = "no-repeat";
+  };
+  reader.readAsDataURL(file);
+});
+
 
 // ================= INIT =================
 updateDisplay();

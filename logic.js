@@ -13,6 +13,13 @@ window.CalcLogic = {
     expr = expr.replace(/\^/g, "**");
     expr = expr.replace(/%/g, "/100");
 
+    if (/\/\s*0(\D|$)/.test(expr)) {
+      return NaN;
+    }
+    if (result === Infinity) return NaN;
+      if (result === -Infinity) return NaN;
+      if (Number.isNaN(result)) return NaN;
+
     try {
       return Function(`"use strict"; return (${expr})`)();
     } catch {
